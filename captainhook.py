@@ -52,7 +52,7 @@ if r.ok:
                     continue
         ## Get all existing hooks
         hs = requests.get(hurl, auth=auth)
-        if not r.ok:
+        if not hs.ok:
             print " Failed: ", name
             continue
         hj = json.loads(hs.text or hs.content)
@@ -74,3 +74,5 @@ if r.ok:
                 print " Failed to set hook for ", name
         else:
             print " Hook already exists for ", name
+else:
+    print " Failed: ", r

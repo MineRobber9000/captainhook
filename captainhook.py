@@ -12,20 +12,21 @@ hook = {
     ],
     "config": {
         "branch_regexes": "",
-        "nick": "github",
+        "nick": "GitHub",
         "password": "",
-        "long_url": "1",
         "room": "#captainhook",
         "server": "irc.example.com",
         "port": "6667"
     }
 }
 
-username = raw_input('Enter github username:')
-password = getpass.getpass("Enter github.com password for '%s':" % (username,))
-org = raw_input('Enter github org:')
-server = raw_input("Enter irc server hostname:")
-room = raw_input("Enter #channel::key or #channel:")
+username = raw_input('Enter github username: ')
+password = getpass.getpass("Enter github.com password for '%s': " % (username,))
+org = raw_input('Enter github org: ')
+server = raw_input("Enter irc server hostname: ")
+room = raw_input("Enter #channel::key or #channel: ")
+overwrite = raw_input("Overwrite existing hooks? [y/N] ")
+overwrite = overwrite == "Y" or overwrite == "y"
 
 hook['config']['server'] = server
 hook['config']['room'] = room
@@ -50,22 +51,23 @@ if r.ok:
             else:
                 if not (inp == "" or inp == "y" or inp == "Y"):
                     continue
-        ## Get all existing hooks
-        hs = requests.get(hurl, auth=auth)
-        if not r.ok:
-            print " Failed: ", name
-            continue
-        hj = json.loads(hs.text or hs.content)
-        ## Look for existing hook that matches this one
-        found = False
-        for h in hj:
-            if h['name'] != hook['name']:
+        if not overwrite:
+            ## Get all existing hooks
+            hs = requests.get(hurl, auth=auth)
+            if not r.ok:
+                print " Failed: ", name
                 continue
-            if h['config']['room'] == hook['config']['room'] and h['config']['server'] == hook['config']['server'] and h['active']:
-                found = True
-                break
+            hj = json.loads(hs.text or hs.content)
+            ## Look for existing hook that matches this one
+            found = False
+            for h in hj:
+                if h['name'] != hook['name']:
+                    continue
+                if h['config']['room'] == hook['config']['room'] and h['config']['server'] == hook['config']['server'] and h['active']:
+                    found = True
+                    break
         ## Setup hook, if matching one not found
-        if not found:
+        if overwrite or not found:
             headers = {'Content-type': 'application/json'}
             k = requests.post(hurl, auth=auth, data=json.dumps(hook), headers=headers)
             if k.ok:

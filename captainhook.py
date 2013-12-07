@@ -34,7 +34,7 @@ hook['config']['room'] = room
 auth = requests.auth.HTTPBasicAuth(username, password)
 
 doall = False
-r = requests.get('https://api.github.com/orgs/%s/repos' % (org,), auth=auth)
+r = requests.get('https://api.github.com/orgs/%s/repos?per_page=100' % (org,), auth=auth)
 if r.ok:
     j = json.loads(r.text or r.content)
     for org in j:
@@ -54,8 +54,8 @@ if r.ok:
         if not overwrite:
             ## Get all existing hooks
             hs = requests.get(hurl, auth=auth)
-            if not r.ok:
-                print " Failed: ", name
+            if not hs.ok:
+                print "  Failed:", name
                 continue
             hj = json.loads(hs.text or hs.content)
             ## Look for existing hook that matches this one
@@ -71,8 +71,10 @@ if r.ok:
             headers = {'Content-type': 'application/json'}
             k = requests.post(hurl, auth=auth, data=json.dumps(hook), headers=headers)
             if k.ok:
-                print " Set hook for ", name
+                print "  Set hook for", name
             else:
-                print " Failed to set hook for ", name
+                print "  Failed to set hook for", name
         else:
-            print " Hook already exists for ", name
+            print "  Hook already exists for", name
+else:
+    print "  Failed:", r

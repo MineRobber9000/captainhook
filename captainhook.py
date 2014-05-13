@@ -20,12 +20,12 @@ hook = {
     }
 }
 
-username = raw_input('Enter github username: ')
+username = input('Enter github username: ')
 password = getpass.getpass("Enter github.com password for '%s': " % (username,))
-org = raw_input('Enter github org: ')
-server = raw_input("Enter irc server hostname: ")
-room = raw_input("Enter #channel::key or #channel: ")
-overwrite = raw_input("Overwrite existing hooks? [y/N] ")
+org = input('Enter github org: ')
+server = input("Enter irc server hostname: ")
+room = input("Enter #channel::key or #channel: ")
+overwrite = input("Overwrite existing hooks? [y/N] ")
 overwrite = overwrite == "Y" or overwrite == "y"
 
 hook['config']['server'] = server
@@ -40,10 +40,10 @@ if r.ok:
     for org in j:
         name = org['name']
         hurl = org['hooks_url']
-        print name
+        print(name)
         ## Prompt
         if not doall:
-            inp = raw_input("Add hook for %s? [Y/n/a/q] " % (name,))
+            inp = input("Add hook for %s? [Y/n/a/q] " % (name,))
             if inp == "q":
                 sys.exit(0)
             if inp == "a":
@@ -55,7 +55,7 @@ if r.ok:
             ## Get all existing hooks
             hs = requests.get(hurl, auth=auth)
             if not hs.ok:
-                print "  Failed:", name
+                print("  Failed:", name)
                 continue
             hj = json.loads(hs.text or hs.content)
             ## Look for existing hook that matches this one
@@ -71,10 +71,10 @@ if r.ok:
             headers = {'Content-type': 'application/json'}
             k = requests.post(hurl, auth=auth, data=json.dumps(hook), headers=headers)
             if k.ok:
-                print "  Set hook for", name
+                print("  Set hook for", name)
             else:
-                print "  Failed to set hook for", name
+                print("  Failed to set hook for", name)
         else:
-            print "  Hook already exists for", name
+            print("  Hook already exists for", name)
 else:
-    print "  Failed:", r
+    print("  Failed:", r)

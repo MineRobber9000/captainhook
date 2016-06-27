@@ -36,7 +36,7 @@ auth = requests.auth.HTTPBasicAuth(username, password)
 doall = False
 r = requests.get('https://api.github.com/orgs/%s/repos?per_page=100' % (org,), auth=auth)
 if r.ok:
-    j = json.loads(r.text or r.content)
+    j = r.json()
     for org in j:
         name = org['name']
         hurl = org['hooks_url']
